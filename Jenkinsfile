@@ -1,79 +1,49 @@
 pipeline {
     agent any
+
     environment {
-        //be sure to replace "bhavukm" with your own Docker Hub username
-        DOCKER_IMAGE_NAME = "mohitkhokhar172/train-schedule"
+        DOCKER_IMAGE = 'NamdevMunde/train-schedule'
+        DOCKER_CREDENTIALS_ID = '529cffdb-6d85-4c0d-b087-dd9194f9fcb8' // Set in Jenkins credentials
     }
+
     stages {
-        stage('Build') {
+        stage('Clone Repo') {
             steps {
-                echo 'Running build automation'
-                sh './gradlew build --no-daemon'
-                archiveArtifacts artifacts: 'dist/trainSchedule.zip'
+                git 'https://github.com/MundeNamdev/cicd-pipeline-train-schedule-autodeploy'
             }
         }
+
         stage('Build Docker Image') {
-            when {
-                branch 'master'
-            }
             steps {
                 script {
-                    app = docker.build(DOCKER_IMAGE_NAME)
-                    app.inside {
-                        sh 'echo Hello, World!'
+                    dockerImage = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('', 529cffdb-6d85-4c0d-b087-dd9194f9fcb8) {
+                        dockerImage.push()
+                        dockerImage.push('latest')
                     }
                 }
             }
         }
-        stage('Push Docker Image') {
-            when {
-                branch 'master'
-            }
+
+        stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
-                    }
-                }
+                sh '''
+                kubectl set image deployment/train-schedule train-schedule=NamdevMunde/train-schedule:${BUILD_NUMBER} --record
+                '''
             }
         }
-        stage('CanaryDeploy') {
-            when {
-                branch 'master'
-            }
-            environment { 
-                CANARY_REPLICAS = 1
-            }
-            steps {
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig',
-                    configs: 'train-schedule-kube-canary.yml',
-                    enableConfigSubstitution: true
-                )
-            }
-        }
-        stage('DeployToProduction') {
-            when {
-                branch 'master'
-            }
-            environment { 
-                CANARY_REPLICAS = 0
-            }
-            steps {
-                input 'Deploy to Production?'
-                milestone(1)
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig',
-                    configs: 'train-schedule-kube-canary.yml',
-                    enableConfigSubstitution: true
-                )
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig',
-                    configs: 'train-schedule-kube.yml',
-                    enableConfigSubstitution: true
-                )
-            }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
