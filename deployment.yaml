@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: train-schedule
+  labels:
+    app: train-schedule
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: train-schedule
+  template:
+    metadata:
+      labels:
+        app: train-schedule
+    spec:
+      containers:
+      - name: train-schedule
+        image: NamdevMunde/train-schedule-app:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ENV_VAR
+          value: "some_value"
