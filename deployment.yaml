@@ -1,3 +1,4 @@
+# train-schedule-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,4 +17,4 @@ spec:
       - name: train-schedule
         image: namdevmunde/train-schedule:latest
         ports:
-        - containerPort: 3000
+        - containerPort: 8080
