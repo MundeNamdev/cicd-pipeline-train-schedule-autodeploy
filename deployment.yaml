@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: train-schedule
-        image: NamdevMunde/train-schedule:latest
+        image: namdevmunde/train-schedule:latest
         ports:
         - containerPort: 3000
