@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'NamdevMunde/train-schedule'
-        DOCKER_CREDENTIALS_ID = '529cffdb-6d85-4c0d-b087-dd9194f9fcb8' // Set in Jenkins credentials
+        DOCKER_CREDENTIALS_ID = '529cffdb-6d85-4c0d-b087-dd9194f9fcb8' // Jenkins credentials ID
     }
 
     stages {
@@ -24,7 +24,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', 529cffdb-6d85-4c0d-b087-dd9194f9fcb8) {
+                    docker.withRegistry('', "${DOCKER_CREDENTIALS_ID}") {
                         dockerImage.push()
                         dockerImage.push('latest')
                     }
