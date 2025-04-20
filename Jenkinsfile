@@ -36,7 +36,7 @@ stage('Deploy to Kubernetes') {
     steps {
         bat """
         set KUBECONFIG=C:\\ProgramData\\Jenkins\\.jenkins\\.kube\\config
-        kubectl apply -f train-schedule-deployment.yam
+        kubectl apply -f deployment.yaml
         kubectl set image deployment/train-schedule train-schedule=namdevmunde/train-schedule:%BUILD_NUMBER%
         """
     }
