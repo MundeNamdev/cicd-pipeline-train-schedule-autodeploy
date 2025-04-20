@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'NamdevMunde/train-schedule'
+        DOCKER_IMAGE = 'namdevmunde/train-schedule'
         DOCKER_CREDENTIALS_ID = '529cffdb-6d85-4c0d-b087-dd9194f9fcb8' // Jenkins credentials ID
     }
 
@@ -35,7 +35,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                kubectl set image deployment/train-schedule train-schedule=NamdevMunde/train-schedule:${BUILD_NUMBER} --record
+                kubectl set image deployment/train-schedule train-schedule=namdevmunde/train-schedule:${BUILD_NUMBER} --record
                 '''
             }
         }
