@@ -35,7 +35,7 @@ pipeline {
 stage('Deploy to Kubernetes') {
     steps {
         bat """
-        set KUBECONFIG=C:\ProgramData\Jenkins\.jenkins\.kube\config
+        set KUBECONFIG=C:\\ProgramData\\Jenkins\\.jenkins\\.kube\\config
         kubectl set image deployment/train-schedule train-schedule=namdevmunde/train-schedule:%BUILD_NUMBER%
         """
     }
