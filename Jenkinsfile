@@ -16,7 +16,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Declare dockerImage at the pipeline level so it's accessible in other stages
                     dockerImage = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
                 }
             }
@@ -35,9 +34,9 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                kubectl set image deployment/train-schedule train-schedule=namdevmunde/train-schedule:${BUILD_NUMBER} --record
-                '''
+                bat """
+                kubectl set image deployment/train-schedule train-schedule=namdevmunde/train-schedule:%BUILD_NUMBER% --record
+                """
             }
         }
     }
