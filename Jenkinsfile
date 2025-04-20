@@ -32,13 +32,15 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                bat """
-                kubectl set image deployment/train-schedule train-schedule=namdevmunde/train-schedule:%BUILD_NUMBER% --record
-                """
-            }
-        }
+stage('Deploy to Kubernetes') {
+    steps {
+        bat """
+        set KUBECONFIG=C:\\var\\lib\\jenkins\\.kube\\config
+        kubectl set image deployment/train-schedule train-schedule=namdevmunde/train-schedule:%BUILD_NUMBER%
+        """
+    }
+}
+
     }
 
     post {
